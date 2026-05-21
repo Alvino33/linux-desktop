@@ -1,28 +1,31 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PORT=10000
 
-# Install Desktop Environment yang enteng (XFCE) dan noVNC
-RUN apt-get update && apt-get install -y \
-    xfce4 xfce4-goodies \
-    tightvncserver \
-    novnc websockify \
+RUN apt update && \
+    apt install -y \
+    openssh-server \
     python3 \
     curl \
-    && apt-get clean
+    wget \
+    ssh && \
+    mkdir -p /run/sshd
 
-# Setting folder VNC
-RUN mkdir -p ~/.vnc
+RUN echo "root:root123" | chpasswd
 
-# Set password VNC: vinogg (Bisa lo ganti sesuka hati)
-RUN echo "vinogg" | vncpasswd -f > ~/.vnc/passwd && chmod 600 ~/.vnc/passwd
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config && \
+    echo "UsePAM no" >> /etc/ssh/sshd_config
 
-# Buat script buat jalanin semuanya otomatis
-RUN echo "#!/bin/bash\n\
-vncserver :1 -geometry 1280x720 -depth 24\n\
-websockify --web /usr/share/novnc/ 8080 localhost:5901" > /start.sh && chmod +x /start.sh
+EXPOSE 10000
 
-# Port buat noVNC biar bisa dibuka di browser HP lu
-EXPOSE 8080
-
-CMD ["/start.sh"]
+CMD bash -c "\
+service ssh start && \
+python3 -m http.server 10000 & \
+ssh \
+-o StrictHostKeyChecking=no \
+-o UserKnownHostsFile=/dev/null \
+-p 443 \
+-R0:localhost:22 \
+tcp@a.pinggy.io"
