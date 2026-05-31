@@ -1,6 +1,17 @@
-FROM ubuntu:22.04
-RUN apt update && apt install -y wget tar
-RUN wget https://github.com/xmrig/xmrig/releases/download/v6.22.2/xmrig-6.22.2-linux-static-x64.tar.gz
-RUN tar -xf xmrig-6.22.2-linux-static-x64.tar.gz && cd xmrig-6.22.2 && mv xmrig /xmrig
-COPY config.json /xmrig/config.json
-CMD ["/xmrig", "-c", "/xmrig/config.json"]
+FROM ubuntu:latest
+
+# Install SSHD dan setup environment
+RUN apt-get update && apt-get install -y openssh-server sudo && rm -rf /var/lib/apt/lists/*
+RUN mkdir /var/run/sshd
+
+# Set password root (Silakan ganti 'passwordrahasia' dengan password yang aman)
+RUN echo 'root:vinzz' | chpasswd
+
+# Izinkan login via password dan root
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Railway butuh EXPOSE ini agar tahu port mana yang internal digunakan oleh container
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
